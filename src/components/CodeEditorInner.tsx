@@ -3,6 +3,18 @@ import { python } from "@codemirror/lang-python";
 import { EditorView, Decoration } from "@codemirror/view";
 import { StateField, type Extension } from "@codemirror/state";
 import { useMemo } from "react";
+import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
+import { tags as t } from "@lezer/highlight";
+
+const palette = HighlightStyle.define([
+  { tag: [t.keyword, t.controlKeyword, t.definitionKeyword, t.operatorKeyword], color: "oklch(0.78 0.09 240)", fontWeight: "600" },
+  { tag: [t.string, t.special(t.string)], color: "oklch(0.88 0.09 92)" },
+  { tag: [t.number, t.bool, t.null], color: "oklch(0.8 0.08 30)" },
+  { tag: [t.comment], color: "oklch(0.65 0.02 250)", fontStyle: "italic" },
+  { tag: [t.function(t.variableName), t.function(t.definition(t.variableName))], color: "oklch(0.84 0.07 180)" },
+  { tag: [t.className, t.definition(t.className)], color: "oklch(0.86 0.08 92)" },
+  { tag: [t.operator, t.punctuation], color: "oklch(0.8 0.02 250)" },
+]);
 
 const theme = EditorView.theme(
   {
@@ -33,7 +45,7 @@ export default function CodeEditorInner({ value, onChange, readOnly, minHeight =
   value: string; onChange?: (v: string) => void; readOnly?: boolean; minHeight?: string; ariaLabel: string; highlightLine?: number | null;
 }) {
   const extensions = useMemo(
-    () => [python(), theme, EditorView.lineWrapping, EditorView.contentAttributes.of({ "aria-label": ariaLabel }), lineHighlight(highlightLine)],
+    () => [python(), theme, syntaxHighlighting(palette), EditorView.lineWrapping, EditorView.contentAttributes.of({ "aria-label": ariaLabel }), lineHighlight(highlightLine)],
     [ariaLabel, highlightLine],
   );
   return (

@@ -19,9 +19,11 @@
   "dependencies": {
     "@ai-sdk/openai": "^4.0.96",
     "@codemirror/lang-python": "^6.2.1",
+    "@codemirror/language": "^6.13.1",
     "@codemirror/state": "^6.7.6",
     "@codemirror/view": "^6.43.15",
     "@hookform/resolvers": "^5.2.2",
+    "@lezer/highlight": "^1.2.5",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.8",

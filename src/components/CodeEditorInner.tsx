@@ -51,14 +51,14 @@ export default function CodeEditorInner({ value, onChange, readOnly, minHeight =
   return (
     <CodeMirror
       value={value}
-      onChange={onChange}
-      readOnly={readOnly}
+      {...(onChange ? { onChange } : {})}
+      readOnly={readOnly ?? false}
       editable={!readOnly}
       minHeight={minHeight}
       extensions={extensions}
       theme="none"
       basicSetup={{ foldGutter: false, syntaxHighlighting: false, highlightActiveLine: !readOnly, highlightActiveLineGutter: !readOnly }}
-      placeholder={readOnly ? undefined : "# Paste your Python code here…"}
+      {...(!readOnly ? { placeholder: "# Paste your Python code here…" } : {})}
     />
   );
 }

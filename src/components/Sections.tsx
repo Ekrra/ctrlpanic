@@ -1,5 +1,6 @@
 import { MessageCircleHeart, Footprints, GraduationCap, Leaf, ClipboardPaste, Brain, CheckCircle2 } from "lucide-react";
 import { Mascot } from "./Mascot";
+import { CREATOR_GITHUB_URL } from "@/lib/creator";
 
 export function Navbar() {
   return (
@@ -153,6 +154,10 @@ export function Footer() {
         </nav>
       </div>
       <p className="mx-auto mt-6 max-w-6xl text-center text-xs text-muted-foreground sm:text-left">AI explanations can be wrong sometimes. Always run and test your code.</p>
+      <p className="mx-auto mt-4 max-w-6xl border-t pt-4 text-center text-xs leading-relaxed text-muted-foreground sm:text-left">
+        Created by Sumaia Pathan Ekra · YUNet AIgnite 2026
+        {CREATOR_GITHUB_URL && <> · <a href={CREATOR_GITHUB_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-foreground">GitHub</a></>}
+      </p>
     </footer>
   );
 }

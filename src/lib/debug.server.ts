@@ -14,7 +14,7 @@ If the code has no bug, set hasError=false, errorType="No error found", and sugg
 If the input is not Python, say so kindly in simpleExplanation.`;
 
 export async function analyzePython(code: string, errorMessage: string): Promise<AnalyzeResult> {
-  const apiKey = process.env.LOVABLE_API_KEY;
+  const apiKey = process.env['LOVABLE_API_KEY'];
   if (!apiKey) {
     return { ok: false, kind: "setup", error: "AI isn't configured yet: the server is missing its AI key. Ask the site owner to finish setup." };
   }

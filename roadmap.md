@@ -1,0 +1,4 @@
+- [x] Add Problem Solver and Code Review with real server-side AI.
+- [x] Add three-mode selector and Learn First solution reveal.
+- [x] Preserve Debug Mode and add creator credit with unset GitHub option.
+- [x] Test learning rules, live AI flows, and desktop/mobile layout.

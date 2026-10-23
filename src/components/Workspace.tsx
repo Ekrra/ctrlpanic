@@ -46,7 +46,7 @@ export function Workspace() {
   };
 
   return (
-    <section id="workspace" className="scroll-mt-24 px-4 py-16 sm:py-24">
+    <section className="scroll-mt-24 px-4 py-8 sm:pb-24">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
@@ -72,7 +72,7 @@ export function Workspace() {
             <div className="lg:col-span-3 lg:border-r">
               <label className="block px-4 pt-3 pb-2 text-sm font-semibold">Your Python code</label>
               <div className="bg-code">
-                <CodeEditor value={code} onChange={(v) => { setCode(v); if (problem) setProblem(null); }} minHeight="280px" ariaLabel="Python code editor" highlightLine={analysis?.lineNumber} />
+                <CodeEditor value={code} onChange={(v) => { setCode(v); if (problem) setProblem(null); }} minHeight="280px" ariaLabel="Python code editor" highlightLine={analysis?.lineNumber ?? null} />
               </div>
             </div>
             <div className="flex flex-col gap-4 p-4 lg:col-span-2">

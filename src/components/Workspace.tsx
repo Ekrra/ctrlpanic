@@ -46,7 +46,7 @@ export function Workspace() {
   };
 
   return (
-    <section id="workspace" className="scroll-mt-24 px-4 py-16 sm:py-24">
+    <section className="scroll-mt-24 px-4 py-8 sm:pb-24">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>

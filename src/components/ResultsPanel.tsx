@@ -1,3 +1,5 @@
+import { Button } from "./ui/button";
+import { useLanguage } from "./LanguageProvider";
 import { useState } from "react";
 import { Check, Copy, Lightbulb, ListOrdered, Bug, HelpCircle, Sparkles } from "lucide-react";
 import { toast } from "sonner";
@@ -17,6 +19,7 @@ function Section({ icon, title, children, delay = 0 }: { icon: React.ReactNode; 
 }
 
 export function ResultsPanel({ analysis }: { analysis: Analysis }) {
+  const { t, language } = useLanguage();
   const [copied, setCopied] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
 
@@ -24,10 +27,10 @@ export function ResultsPanel({ analysis }: { analysis: Analysis }) {
     try {
       await navigator.clipboard.writeText(analysis.correctedCode);
       setCopied(true);
-      toast.success("Fixed code copied. Go get 'em.");
+      toast.success(t("Fixed code copied. Go get 'em."));
       setTimeout(() => setCopied(false), 1800);
     } catch {
-      toast.error("Couldn't copy automatically. Select the code and copy it manually.");
+      toast.error(t("Couldn't copy automatically. Select the code and copy it manually."));
     }
   };
 
@@ -39,8 +42,8 @@ export function ResultsPanel({ analysis }: { analysis: Analysis }) {
             <span className={`rounded-full px-3 py-1 font-mono text-xs font-semibold ${analysis.hasError ? "bg-butter text-butter-foreground" : "bg-secondary text-secondary-foreground"}`}>
               {analysis.errorType}
             </span>
-            {analysis.lineNumber && <span className="text-sm text-muted-foreground">Line {analysis.lineNumber}</span>}
-            <span className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs text-muted-foreground"><Sparkles className="size-3" />Live AI analysis</span>
+            {analysis.lineNumber && <span className="text-sm text-muted-foreground">{t("Line")} {analysis.lineNumber}</span>}
+            <span className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs text-muted-foreground"><Sparkles className="size-3" />{t("Live AI analysis")}</span>
           </div>
           <p className="font-display text-lg font-semibold">{analysis.friendlyQuip}</p>
         </div>
@@ -56,26 +59,26 @@ export function ResultsPanel({ analysis }: { analysis: Analysis }) {
       )}
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Section icon={<Bug className="size-4" />} title="What's going on" delay={100}>
+        <Section icon={<Bug className="size-4" />} title={t("What's going on")} delay={100}>
           <p className="leading-relaxed text-muted-foreground">{analysis.simpleExplanation}</p>
         </Section>
-        <Section icon={<HelpCircle className="size-4" />} title="Why it happened" delay={150}>
+        <Section icon={<HelpCircle className="size-4" />} title={t("Why it happened")} delay={150}>
           <p className="leading-relaxed text-muted-foreground">{analysis.whyItHappened}</p>
         </Section>
       </div>
 
       <section className="card-soft animate-rise overflow-hidden" style={{ animationDelay: "200ms" }}>
         <div className="flex items-center justify-between gap-2 border-b px-5 py-3">
-          <h3 className="font-semibold">Corrected code</h3>
-          <button type="button" onClick={copy} className="btn btn-ghost px-3 py-1.5 text-sm" aria-label="Copy corrected code">
+          <h3 className="font-semibold">{t("Corrected code")}</h3>
+          <Button type="button" onClick={copy} className="btn btn-ghost px-3 py-1.5 text-sm" aria-label={t("Copy corrected code")}>
             {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
-            {copied ? "Copied" : "Copy"}
-          </button>
+            {copied ? t("Copied") : t("Copy")}
+          </Button>
         </div>
-        <CodeEditor value={analysis.correctedCode} readOnly minHeight="80px" ariaLabel="Corrected Python code" />
+        <CodeEditor value={analysis.correctedCode} readOnly minHeight="80px" ariaLabel={t("Corrected Python code")} />
       </section>
 
-      <Section icon={<ListOrdered className="size-4" />} title="Step-by-step fix" delay={250}>
+      <Section icon={<ListOrdered className="size-4" />} title={t("Step-by-step fix")} delay={250}>
         <ol className="grid gap-3">
           {analysis.steps.map((s, i) => (
             <li key={i} className="flex gap-3">
@@ -89,10 +92,10 @@ export function ResultsPanel({ analysis }: { analysis: Analysis }) {
       <section className="animate-rise rounded-2xl border bg-butter/40 p-5 sm:p-6" style={{ animationDelay: "300ms" }}>
         <h3 className="mb-2 flex items-center gap-2 font-semibold"><Lightbulb className="size-4" /> Practice round</h3>
         <p className="mb-3 leading-relaxed">{analysis.practice.question}</p>
-        <p className="mb-4 text-sm text-muted-foreground"><span className="font-semibold">Hint:</span> {analysis.practice.hint}</p>
-        <button type="button" className="btn btn-ghost bg-card py-2 text-sm" onClick={() => setShowAnswer((v) => !v)} aria-expanded={showAnswer}>
-          {showAnswer ? "Hide answer" : "Reveal answer"}
-        </button>
+        <p className="mb-4 text-sm text-muted-foreground"><span className="font-semibold">{t("Hint:")}</span> {analysis.practice.hint}</p>
+        <Button type="button" className="btn btn-ghost bg-card py-2 text-sm" onClick={() => setShowAnswer((v) => !v)} aria-expanded={showAnswer}>
+          {showAnswer ? t("Hide answer") : t("Reveal answer")}
+        </Button>
         {showAnswer && <pre className="mt-4 whitespace-pre-wrap rounded-xl bg-code p-4 font-mono text-sm text-code-foreground animate-rise">{analysis.practice.answer}</pre>}
       </section>
     </div>

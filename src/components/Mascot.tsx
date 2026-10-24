@@ -1,3 +1,4 @@
+import { useLanguage } from "./LanguageProvider";
 import panic from "@/assets/mascot-panic.png";
 import confused from "@/assets/mascot-confused.png";
 import happy from "@/assets/mascot-happy.png";
@@ -11,11 +12,12 @@ const ALT: Record<Mood, string> = {
 };
 
 export function Mascot({ mood = "panic", className = "", eager = false }: { mood?: Mood; className?: string; eager?: boolean }) {
+  const { t, language } = useLanguage();
   return (
     <img
       key={mood}
       src={SRC[mood]}
-      alt={ALT[mood]}
+      alt={t(ALT[mood])}
       width={1024}
       height={1024}
       loading={eager ? "eager" : "lazy"}

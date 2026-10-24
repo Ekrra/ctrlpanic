@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Navbar, Hero, Features, HowItWorks, Scenarios, Footer } from "@/components/Sections";
 import { LearningWorkspace } from "@/components/LearningWorkspace";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -17,9 +18,10 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const { t } = useLanguage();
   return (
     <div className="min-h-screen">
-      <a href="#workspace" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-card focus:px-3 focus:py-2">Skip to workspace</a>
+      <a href="#workspace" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-card focus:px-3 focus:py-2">{t("Skip to workspace")}</a>
       <Navbar />
       <main>
         <Hero />

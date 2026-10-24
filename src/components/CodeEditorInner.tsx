@@ -1,3 +1,4 @@
+import { useLanguage } from "./LanguageProvider";
 import CodeMirror from "@uiw/react-codemirror";
 import { python } from "@codemirror/lang-python";
 import { EditorView, Decoration } from "@codemirror/view";
@@ -44,6 +45,7 @@ function lineHighlight(line: number | null | undefined): Extension {
 export default function CodeEditorInner({ value, onChange, readOnly, minHeight = "220px", ariaLabel, highlightLine }: {
   value: string; onChange?: (v: string) => void; readOnly?: boolean; minHeight?: string; ariaLabel: string; highlightLine?: number | null;
 }) {
+  const { t } = useLanguage();
   const extensions = useMemo(
     () => [python(), theme, syntaxHighlighting(palette), EditorView.lineWrapping, EditorView.contentAttributes.of({ "aria-label": ariaLabel }), lineHighlight(highlightLine)],
     [ariaLabel, highlightLine],

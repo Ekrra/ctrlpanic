@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { languageSchema } from "./language";
 
 /** Structured shape the AI must return for every analysis. Shared by server and UI. */
 export const analysisSchema = z.object({
@@ -7,7 +8,7 @@ export const analysisSchema = z.object({
   lineNumber: z.number().int().nullable().describe("1-based line of the problem, or null"),
   lineCode: z.string().nullable().describe("The exact problematic line as written, or null"),
   friendlyQuip: z.string().describe("One short, kind, playful line, e.g. 'Bestie, this line needs a colon.' Never mocking."),
-  simpleExplanation: z.string().describe("2-3 sentences in plain English for a beginner"),
+  simpleExplanation: z.string().describe("2-3 sentences in the selected language for a beginner"),
   whyItHappened: z.string().describe("The underlying concept that caused it"),
   correctedCode: z.string().describe("Full corrected Python code, no markdown fences"),
   steps: z.array(z.string()).describe("3-6 short step-by-step fix explanations"),
@@ -21,6 +22,7 @@ export const analysisSchema = z.object({
 export type Analysis = z.infer<typeof analysisSchema>;
 
 export const analyzeInputSchema = z.object({
+  language: languageSchema,
   code: z.string().trim().min(1, "Paste some Python code first.").max(12000, "That's a lot of code! Keep it under 12,000 characters."),
   errorMessage: z.string().max(4000).optional().default(""),
 });

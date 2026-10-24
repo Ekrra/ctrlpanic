@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Bricolage Grotesque", "Figtree", sans-serif;
+  --font-sans: "Figtree", "Noto Sans Bengali", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Figtree", "Noto Sans Bengali", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -83,7 +83,7 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.02em; }
+  h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0; }
   :focus-visible { outline: 2px solid var(--color-ring); outline-offset: 2px; }
 }
 
@@ -135,3 +135,5 @@
 
 .cm-editor { font-family: var(--font-mono); font-size: 14px; }
 .cm-editor.cm-focused { outline: none; }
+html[lang="bn"] { --font-sans: "Noto Sans Bengali", "Figtree", sans-serif; --font-display: "Noto Sans Bengali", "Bricolage Grotesque", sans-serif; }
+html[lang="bn"] h1 { line-height: 1.3; }

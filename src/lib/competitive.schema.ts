@@ -1,6 +1,8 @@
 import { z } from "zod";
+import { languageSchema } from "./language";
 
 export const competitiveInputSchema = z.object({
+  language: languageSchema,
   mode: z.enum(["solver", "review"]),
   statement: z.string().trim().max(18000),
   sampleInput: z.string().max(4000),

@@ -15,3 +15,4 @@
 - LearningWorkspace keeps each mode mounted independently; CompetitiveWorkspace shares solver/review form logic, and competitive.functions.ts delegates structured AI work to competitive.server.ts. Why: preserves Debug Mode and each mode's inputs while keeping keys and prompts server-only.
 - Competitive AI uses request-local Responses and run-ID helpers under src/lib/ai; no submitted Python is executed. Why: real analysis without unsafe execution or false judge verdicts.
 - Optional creator profile links are configured through src/lib/creator.ts and omitted until set. Why: no invented destination or dead placeholder link.
+- LanguageProvider owns the shared session language; shared language validation and translation helpers feed existing forms and server prompts. Why: mode switches stay consistent without modifying Python or fabricating translated AI results.

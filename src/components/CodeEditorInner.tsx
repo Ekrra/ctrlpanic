@@ -60,7 +60,7 @@ export default function CodeEditorInner({ value, onChange, readOnly, minHeight =
       extensions={extensions}
       theme="none"
       basicSetup={{ foldGutter: false, syntaxHighlighting: false, highlightActiveLine: !readOnly, highlightActiveLineGutter: !readOnly }}
-      {...(!readOnly ? { placeholder: "# Paste your Python code here…" } : {})}
+      {...(!readOnly ? { placeholder: t("# Paste your Python code here…") } : {})}
     />
   );
 }

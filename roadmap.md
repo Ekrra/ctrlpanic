@@ -2,6 +2,6 @@
 - [x] Add three-mode selector and Learn First solution reveal.
 - [x] Preserve Debug Mode and add creator credit with unset GitHub option.
 - [x] Test learning rules, live AI flows, and desktop/mobile layout.
-- [ ] Add complete English/Bangla interface and AI language selection.
-- [ ] Improve constraint-aware beginner Python instruction in Problem Solver.
-- [ ] Test bilingual modes, errors, loading, and real AI output.
+- [x] Add complete English/Bangla interface and AI language selection.
+- [x] Improve constraint-aware beginner Python instruction in Problem Solver.
+- [x] Test bilingual modes, errors, loading, and real AI output.

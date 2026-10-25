@@ -80,8 +80,8 @@ export function Workspace() {
             </div>
             <div className="flex flex-col gap-4 p-4 lg:col-span-2">
               <div className="flex flex-1 flex-col">
-                <label htmlFor="err" className="mb-2 text-sm font-semibold">Error message <span className="font-normal text-muted-foreground">{t("(optional)")}</span></label>
-                <textarea id="err" value={errorMsg} onChange={(e) => setErrorMsg(e.target.value)} placeholder="Paste the traceback here if you have one…"
+<label htmlFor="err" className="mb-2 text-sm font-semibold">{t("Error message")} <span className="font-normal text-muted-foreground">{t("(optional)")}</span></label>
+                <textarea id="err" value={errorMsg} onChange={(e) => setErrorMsg(e.target.value)} placeholder={t("Paste the traceback here if you have one…")}
                   className="min-h-36 flex-1 resize-y rounded-xl border bg-background p-3 font-mono text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/30" />
               </div>
               {problem && (
@@ -92,7 +92,7 @@ export function Workspace() {
               <div className="flex flex-col gap-2 sm:flex-row lg:flex-col xl:flex-row">
                 <Button type="button" onClick={submit} disabled={loading} className="btn btn-primary flex-1">
                   {loading ? <Loader2 className="size-4 animate-spin" /> : <Wand2 className="size-4" />}
-                  {loading ? "Analyzing…" : t("Analyze my code")}
+                  {loading ? t("Analyzing…") : t("Analyze my code")}
                 </Button>
                 <Button type="button" onClick={reset} disabled={loading} className="btn btn-ghost"><RotateCcw className="size-4" />{t("Reset")}</Button>
               </div>

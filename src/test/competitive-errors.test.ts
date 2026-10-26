@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { analyzeCompetitive } from "@/lib/competitive.server";
-import { competitiveInputSchema } from "@/lib/competitive.schema";
+import { competitiveAnalysisSchema, competitiveInputSchema } from "@/lib/competitive.schema";
 
 vi.mock("@tanstack/react-start/server", () => ({ getRequest: () => new Request("http://localhost:8080") }));
 
@@ -9,6 +9,21 @@ const input = competitiveInputSchema.parse({ mode: "solver", language: "bn", sta
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); vi.restoreAllMocks(); });
 
 describe("Problem Solver gateway failure propagation through the real streaming SDK", () => {
+  it("still parses a completed structured response after consuming the full stream (test fixture, not live AI)", async () => {
+    vi.stubEnv("LOVABLE_API_KEY", "test-key-not-a-secret");
+    const analysis = competitiveAnalysisSchema.parse({ summary: "Test fixture", problemExplanation: "Test fixture", inputBreakdown: "Two integers", outputBreakdown: "Their product", concepts: [], hints: ["Multiply"], algorithm: ["Read", "Multiply", "Print"], solution: "a, b = map(int, input().split())\nprint(a * b)", lineExplanations: [{ line: 1, explanation: "Read both numbers" }, { line: 2, explanation: "Print the product" }], complexity: { time: "O(1)", space: "O(1)", explanation: "Two integers" }, issues: [], testCases: [], caveats: [] });
+    const text = JSON.stringify(analysis);
+    const item = { type: "message", id: "msg_fixture", status: "completed", role: "assistant", content: [{ type: "output_text", text, annotations: [] }] };
+    const events = [
+      { type: "response.created", response: { id: "resp_fixture", created_at: 1, model: "openai/gpt-6-astra" } },
+      { type: "response.output_item.added", output_index: 0, item },
+      { type: "response.output_text.delta", item_id: "msg_fixture", output_index: 0, content_index: 0, delta: text },
+      { type: "response.output_item.done", output_index: 0, item },
+      { type: "response.completed", response: { id: "resp_fixture", status: "completed", output: [item], usage: { input_tokens: 1, output_tokens: 1 } } },
+    ];
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(events.map(event => `data: ${JSON.stringify(event)}\n\n`).join(""), { headers: { "content-type": "text/event-stream" } })));
+    expect(await analyzeCompetitive(input)).toEqual({ ok: true, analysis, execution: "not-executed" });
+  });
   it.each([401, 402, 403, 404, 429, 500])("preserves HTTP %s instead of hiding it behind missing output, without retrying", async status => {
     vi.stubEnv("LOVABLE_API_KEY", "test-key-not-a-secret");
     vi.spyOn(console, "error").mockImplementation(() => {});

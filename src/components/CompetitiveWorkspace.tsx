@@ -1,5 +1,5 @@
 import { useLanguage } from "./LanguageProvider";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AlertTriangle, BookOpen, Loader2, RotateCcw, SearchCheck } from "lucide-react";
 import { analyzeCompetition } from "@/lib/competitive.functions";
@@ -19,21 +19,33 @@ export function CompetitiveWorkspace({ mode }: { mode: Mode }) {
   const [input, setInput] = useState(empty);
   const [problem, setProblem] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [retryUntil, setRetryUntil] = useState(0);
+  const submitting = useRef(false);
+  useEffect(() => {
+    if (!retryUntil) return;
+    const timer = setTimeout(() => setRetryUntil(0), Math.max(0, retryUntil - Date.now()));
+    return () => clearTimeout(timer);
+  }, [retryUntil]);
   const [result, setResult] = useState<{ analysis: CompetitiveAnalysis; learnFirst: boolean } | null>(null);
   const results = useRef<HTMLDivElement>(null);
   const run = useServerFn(analyzeCompetition);
   const review = mode === "review";
   const update = (key: keyof typeof empty, value: string | boolean) => { setInput(s => ({ ...s, [key]: value })); setProblem(null); };
   const submit = async () => {
+    if (submitting.current || (!review && retryUntil > Date.now())) return;
     const parsed = competitiveInputSchema.safeParse({ ...input, mode, language });
     if (!parsed.success) { setProblem(parsed.error.issues[0]?.message ?? t("Please check your inputs.")); return; }
+    submitting.current = true;
     setLoading(true); setProblem(null); setResult(null);
     try {
       const response = await run({ data: parsed.data as CompetitiveInput });
       if (response.ok) { setResult({ analysis: response.analysis, learnFirst: !review && input.learnFirst }); requestAnimationFrame(() => results.current?.scrollIntoView({ behavior: "smooth", block: "start" })); }
-      else setProblem(response.error);
+      else {
+        setProblem(response.error);
+        if (!review && response.retryAfterSeconds) setRetryUntil(Date.now() + response.retryAfterSeconds * 1000);
+      }
     } catch { setProblem(t("Couldn't reach the AI tutor. Your inputs are safe here; check your connection before trying again.")); }
-    finally { setLoading(false); }
+    finally { submitting.current = false; setLoading(false); }
   };
   return <section className="px-4 pt-8 pb-16 sm:pb-24"><div className="mx-auto max-w-6xl">
     <div className="mb-6 flex items-center justify-between gap-4"><div><p className="mb-2 font-mono text-xs uppercase tracking-widest text-primary">{t("Competitive programming")}</p><h2 className="text-3xl font-bold sm:text-4xl">{review ? t("Your code. A second pair of eyes.") : t("Think it through. Then code it.")}</h2></div><Mascot mood={loading ? "confused" : "happy"} className={`size-20 shrink-0 sm:size-28 ${loading ? "animate-wiggle" : ""}`} /></div>
@@ -47,7 +59,7 @@ export function CompetitiveWorkspace({ mode }: { mode: Mode }) {
         {!review && <label className="flex w-fit cursor-pointer items-center gap-3 text-sm font-semibold"><input type="checkbox" checked={input.learnFirst} onChange={e => update("learnFirst", e.target.checked)} className="size-4 accent-primary" />{t("Learn First")}</label>}
       </fieldset>
       {problem && <div role="alert" className="mt-5 flex gap-2 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm"><AlertTriangle className="size-4 shrink-0 text-destructive" />{t(problem)}</div>}
-      <div className="mt-5 flex flex-wrap gap-3"><Button type="submit" disabled={loading} className="btn btn-primary h-auto whitespace-normal">{loading ? <Loader2 className="animate-spin" /> : review ? <SearchCheck /> : <BookOpen />}{loading ? t("Thinking it through…") : review ? t("Review my solution") : t("Help me solve it")}</Button><Button type="button" disabled={loading} variant="outline" className="btn btn-ghost h-auto" onClick={() => { setInput(empty); setProblem(null); setResult(null); }}><RotateCcw />{t("Reset")}</Button></div>
+      <div className="mt-5 flex flex-wrap gap-3"><Button type="submit" disabled={loading || (!review && retryUntil > 0)} className="btn btn-primary h-auto whitespace-normal">{loading ? <Loader2 className="animate-spin" /> : review ? <SearchCheck /> : <BookOpen />}{loading ? t("Thinking it through…") : !review && retryUntil > 0 ? t("Please wait before retrying") : review ? t("Review my solution") : t("Help me solve it")}</Button><Button type="button" disabled={loading} variant="outline" className="btn btn-ghost h-auto" onClick={() => { setInput(empty); setProblem(null); setResult(null); }}><RotateCcw />{t("Reset")}</Button></div>
     </form>
     <div ref={results} className="scroll-mt-28 pt-8">{loading && <div role="status" className="flex items-center gap-3 border-y py-6"><Loader2 className="size-5 shrink-0 animate-spin text-primary" /><p>{t("Connecting the dots, one step at a time\u2026")}</p></div>}{!loading && result && <CompetitiveResults analysis={result.analysis} learnFirst={result.learnFirst} review={review} />}</div>
   </div></section>;

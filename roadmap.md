@@ -5,3 +5,5 @@
 - [x] Add complete English/Bangla interface and AI language selection.
 - [x] Improve constraint-aware beginner Python instruction in Problem Solver.
 - [x] Test bilingual modes, errors, loading, and real AI output.
+- [x] Repair Problem Solver error propagation and verify failures, input retention, and safe retries.
+- [ ] Verify a new live Problem Solver analysis (blocked until AI credits are restored).

@@ -33,6 +33,6 @@ export const competitiveAnalysisSchema = z.object({
 
 export type CompetitiveInput = z.infer<typeof competitiveInputSchema>;
 export type CompetitiveAnalysis = z.infer<typeof competitiveAnalysisSchema>;
-export type CompetitiveResult = { ok: true; analysis: CompetitiveAnalysis; execution: "not-executed" } | { ok: false; error: string };
+export type CompetitiveResult = { ok: true; analysis: CompetitiveAnalysis; execution: "not-executed" } | { ok: false; error: string; retryAfterSeconds?: number };
 export const EXECUTION_STATUS = "not-executed" as const;
 export function shouldRevealSolution(learnFirst: boolean, revealed: boolean) { return !learnFirst || revealed; }

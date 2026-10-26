@@ -33,7 +33,7 @@ describe("Problem Solver gateway failure propagation through the real streaming 
     }));
     vi.stubGlobal("fetch", fetchMock);
     const response = await analyzeCompetitive(input);
-    expect(response).toEqual({ ok: false, error: message, ...([429, 500].includes(status) ? { retryAfterSeconds: 12 } : {}) });
+    expect(response).toEqual({ ok: false, error: message, errorStatus: status, ...([429, 500].includes(status) ? { retryAfterSeconds: 12 } : {}) });
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const args = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(String(args[0])).toBe("https://ai.gateway.lovable.dev/v1/responses");
@@ -51,6 +51,13 @@ describe("Problem Solver gateway failure propagation through the real streaming 
     vi.stubEnv("LOVABLE_API_KEY", "test-key-not-a-secret");
     vi.spyOn(console, "error").mockImplementation(() => {});
     vi.stubGlobal("fetch", vi.fn(async () => new Response("{}", { status: 402, headers: { "content-type": "application/json" } })));
-    expect(await analyzeCompetitive(input)).toEqual({ ok: false, error: "AI credits are unavailable. The workspace owner needs to add credits before a new request." });
+    expect(await analyzeCompetitive(input)).toEqual({ ok: false, errorStatus: 402, error: "AI credits are unavailable. The workspace owner needs to add credits before a new request." });
+  });
+  it("identifies missing setup without sending an AI request", async () => {
+    vi.stubEnv("LOVABLE_API_KEY", "");
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    expect(await analyzeCompetitive(input)).toEqual({ ok: false, errorStatus: 401, error: "AI setup is incomplete. The site owner needs to configure the AI key." });
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

@@ -8,6 +8,7 @@ import { Button } from "./ui/button";
 import { CodeEditor } from "./CodeEditor";
 import { Mascot } from "./Mascot";
 import { CompetitiveResults } from "./CompetitiveResults";
+import { SolverAvailability } from "./SolverAvailability";
 
 type Mode = "solver" | "review";
 const empty = { statement: "", sampleInput: "", sampleOutput: "", constraints: "", code: "", learnFirst: true };
@@ -20,6 +21,8 @@ export function CompetitiveWorkspace({ mode }: { mode: Mode }) {
   const [problem, setProblem] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [retryUntil, setRetryUntil] = useState(0);
+  const [aiStatus, setAiStatus] = useState<number | undefined>();
+  const [aiSucceeded, setAiSucceeded] = useState(false);
   const submitting = useRef(false);
   useEffect(() => {
     if (!retryUntil) return;
@@ -39,8 +42,9 @@ export function CompetitiveWorkspace({ mode }: { mode: Mode }) {
     setLoading(true); setProblem(null); setResult(null);
     try {
       const response = await run({ data: parsed.data as CompetitiveInput });
-      if (response.ok) { setResult({ analysis: response.analysis, learnFirst: !review && input.learnFirst }); requestAnimationFrame(() => results.current?.scrollIntoView({ behavior: "smooth", block: "start" })); }
+      if (response.ok) { setAiStatus(undefined); setAiSucceeded(true); setResult({ analysis: response.analysis, learnFirst: !review && input.learnFirst }); requestAnimationFrame(() => results.current?.scrollIntoView({ behavior: "smooth", block: "start" })); }
       else {
+        setAiStatus(response.errorStatus); setAiSucceeded(false);
         setProblem(response.error);
         if (!review && response.retryAfterSeconds) setRetryUntil(Date.now() + response.retryAfterSeconds * 1000);
       }
@@ -50,6 +54,7 @@ export function CompetitiveWorkspace({ mode }: { mode: Mode }) {
   return <section className="px-4 pt-8 pb-16 sm:pb-24"><div className="mx-auto max-w-6xl">
     <div className="mb-6 flex items-center justify-between gap-4"><div><p className="mb-2 font-mono text-xs uppercase tracking-widest text-primary">{t("Competitive programming")}</p><h2 className="text-3xl font-bold sm:text-4xl">{review ? t("Your code. A second pair of eyes.") : t("Think it through. Then code it.")}</h2></div><Mascot mood={loading ? "confused" : "happy"} className={`size-20 shrink-0 sm:size-28 ${loading ? "animate-wiggle" : ""}`} /></div>
     <p className="mb-5 text-sm text-muted-foreground">{t(review ? "AI-based review · Submitted code is not executed." : "AI-based guidance · Submitted code is not executed.")}</p>
+    {!review && <SolverAvailability status={aiStatus} loading={loading} succeeded={aiSucceeded} />}
     <form onSubmit={e => { e.preventDefault(); void submit(); }} className="min-w-0">
       <fieldset disabled={loading} className="grid min-w-0 gap-5 disabled:opacity-70">
         <Field id={`${mode}-statement`} label={t(review ? "Problem statement (optional, helps check logic)" : "Problem statement")} value={input.statement} onChange={v => update("statement", v)} placeholder={t("Paste the complete problem statement…")} tall />

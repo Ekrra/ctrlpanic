@@ -1,4 +1,8 @@
 export const bangla: Record<string, string> = {
+  "Please wait before retrying": "আবার চেষ্টা করার আগে একটু অপেক্ষা করুন",
+  "The AI service had a temporary problem. Please wait before trying again.": "AI সেবায় সাময়িক সমস্যা হয়েছে। আবার চেষ্টা করার আগে একটু অপেক্ষা করুন।",
+  "The AI request was rejected. The site owner needs to check the request configuration.": "AI অনুরোধটি গ্রহণ করেনি। সাইটের মালিককে অনুরোধের সেটআপ যাচাই করতে হবে।",
+  "The AI returned an incomplete or invalid analysis. Your inputs are still here; no code was executed.": "AI অসম্পূর্ণ বা সঠিক গঠনের নয় এমন বিশ্লেষণ দিয়েছে। আপনার লেখা এখানেই আছে; কোনো কোড চালানো হয়নি।",
   "Main": "প্রধান নেভিগেশন",
   "How It Works": "যেভাবে কাজ করে",
   "How it works": "যেভাবে কাজ করে",

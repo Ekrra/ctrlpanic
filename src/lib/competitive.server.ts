@@ -13,7 +13,7 @@ Return concise structured output. summary is a short friendly takeaway. lineExpl
 
 export async function analyzeCompetitive(input: CompetitiveInput): Promise<CompetitiveResult> {
   const apiKey = process.env['LOVABLE_API_KEY'];
-  if (!apiKey) return { ok: false, error: "AI setup is incomplete. The site owner needs to configure the AI key." };
+  if (!apiKey) return { ok: false, errorStatus: 401, error: "AI setup is incomplete. The site owner needs to configure the AI key." };
   try {
     const { result } = createResponsesCall(getRequest(), {
       baseURL: "https://ai.gateway.lovable.dev/v1", apiKey, model: "openai/gpt-6-astra",
@@ -34,8 +34,9 @@ export async function analyzeCompetitive(input: CompetitiveInput): Promise<Compe
     const retryAfterSeconds = Number.isFinite(retrySeconds) && retrySeconds >= 0
       ? Math.max(1, Math.ceil(retrySeconds))
       : Number.isFinite(retryDate) ? Math.max(1, Math.ceil((retryDate - Date.now()) / 1000)) : 30;
-    const retry = err.statusCode === 429 || (err.statusCode !== undefined && err.statusCode >= 500)
+    const retryDelay = err.statusCode === 429 || (err.statusCode !== undefined && err.statusCode >= 500)
       ? { retryAfterSeconds } : {};
+    const retry = { ...(err.statusCode === undefined ? {} : { errorStatus: err.statusCode }), ...retryDelay };
     let safeMessage = "";
     try {
       const body = JSON.parse(err.responseBody ?? "{}");
@@ -43,13 +44,13 @@ export async function analyzeCompetitive(input: CompetitiveInput): Promise<Compe
       if (typeof message === "string") safeMessage = message;
     } catch { /* No structured provider message. */ }
     if (safeMessage) return { ok: false, error: safeMessage, ...retry };
-    if (err.statusCode === 401) return { ok: false, error: "AI configuration needs attention from the site owner." };
-    if (err.statusCode === 402) return { ok: false, error: "AI credits are unavailable. The workspace owner needs to add credits before a new request." };
-    if (err.statusCode === 403) return { ok: false, error: "AI access is blocked. The workspace owner needs to restore access before a new request." };
+    if (err.statusCode === 401) return { ok: false, error: "AI configuration needs attention from the site owner.", ...retry };
+    if (err.statusCode === 402) return { ok: false, error: "AI credits are unavailable. The workspace owner needs to add credits before a new request.", ...retry };
+    if (err.statusCode === 403) return { ok: false, error: "AI access is blocked. The workspace owner needs to restore access before a new request.", ...retry };
     if (err.statusCode === 429) return { ok: false, error: "AI is busy right now. Please wait before trying again.", ...retry };
-    if (err.statusCode === 404) return { ok: false, error: "The AI service is unavailable. Please wait until access is restored." };
+    if (err.statusCode === 404) return { ok: false, error: "The AI service is unavailable. Please wait until access is restored.", ...retry };
     if (err.statusCode !== undefined && err.statusCode >= 500) return { ok: false, error: "The AI service had a temporary problem. Please wait before trying again.", ...retry };
-    if (err.statusCode === 400) return { ok: false, error: "The AI request was rejected. The site owner needs to check the request configuration." };
+    if (err.statusCode === 400) return { ok: false, error: "The AI request was rejected. The site owner needs to check the request configuration.", ...retry };
     if (error instanceof Error && (error.name.includes("NoObjectGenerated") || error.name.includes("ZodError"))) return { ok: false, error: "The AI returned an incomplete or invalid analysis. Your inputs are still here; no code was executed." };
     return { ok: false, error: "The AI couldn't complete this analysis. Your inputs are still here; no code was executed." };
   }

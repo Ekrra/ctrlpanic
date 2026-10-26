@@ -7,3 +7,4 @@
 - [x] Test bilingual modes, errors, loading, and real AI output.
 - [x] Repair Problem Solver error propagation and verify failures, input retention, and safe retries.
 - [ ] Verify a new live Problem Solver analysis (blocked until AI credits are restored).
+- [x] Add bilingual Problem Solver AI availability and credit/setup recovery guidance based on actual request status.

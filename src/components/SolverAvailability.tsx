@@ -1,7 +1,7 @@
 import { CheckCircle2, Info, Loader2, AlertTriangle } from "lucide-react";
 import { useLanguage } from "./LanguageProvider";
 
-export function SolverAvailability({ status, loading, succeeded }: { status?: number; loading: boolean; succeeded: boolean }) {
+export function SolverAvailability({ status, loading, succeeded }: { status: number | undefined; loading: boolean; succeeded: boolean }) {
   const { t } = useLanguage();
   const title = loading ? "AI availability · Checking with your request"
     : status === 402 ? "AI paused · Credits unavailable"

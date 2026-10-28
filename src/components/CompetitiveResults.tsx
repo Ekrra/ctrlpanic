@@ -24,7 +24,7 @@ export function CompetitiveResults({ analysis: a, learnFirst, review, sample = f
     catch { toast.error(t("Couldn't copy. Select the code and copy it manually.")); }
   };
   return <div aria-live="polite" className="animate-rise min-w-0 break-words">
-    <div className="border-b pb-5"><p className="mb-2 text-xs font-medium text-muted-foreground">{t("Live AI analysis \u00b7 Code not executed")}</p><h3 className="text-xl font-semibold">{a.summary}</h3><p className="mt-2 text-sm text-muted-foreground">{t("No judge verdict. Test the solution yourself before submitting.")}</p></div>
+    <div className="border-b pb-5"><p className="mb-2 text-xs font-medium text-muted-foreground">{sample ? t("Offline demo sample \u00b7 Code not executed") : t("Live AI analysis \u00b7 Code not executed")}</p><h3 className="text-xl font-semibold">{a.summary}</h3><p className="mt-2 text-sm text-muted-foreground">{t("No judge verdict. Test the solution yourself before submitting.")}</p></div>
     <Section title={review ? t("Understanding your solution") : t("The problem, in plain English")}><p className="whitespace-pre-wrap leading-relaxed">{a.problemExplanation}</p></Section>
     <div className="grid gap-x-8 sm:grid-cols-2"><Section title={t("Input breakdown")}><p className="whitespace-pre-wrap leading-relaxed">{a.inputBreakdown}</p></Section><Section title={t("Output breakdown")}><p className="whitespace-pre-wrap leading-relaxed">{a.outputBreakdown}</p></Section></div>
     {a.concepts.length > 0 && <Section title={t("Concepts to know")}><dl className="grid gap-3">{a.concepts.map((c, i) => <div key={i}><dt className="font-semibold">{c.name}</dt><dd className="leading-relaxed text-muted-foreground">{c.explanation}</dd></div>)}</dl></Section>}

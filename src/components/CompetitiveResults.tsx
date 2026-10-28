@@ -13,7 +13,7 @@ function Steps({ items }: { items: string[] }) {
   return <ol className="grid gap-3">{items.map((item, i) => <li className="flex min-w-0 gap-3" key={i}><span className="grid size-6 shrink-0 place-items-center rounded-full bg-secondary text-xs font-bold">{i + 1}</span><p className="min-w-0 whitespace-pre-wrap break-words leading-relaxed">{item}</p></li>)}</ol>;
 }
 
-export function CompetitiveResults({ analysis: a, learnFirst, review }: { analysis: CompetitiveAnalysis; learnFirst: boolean; review: boolean }) {
+export function CompetitiveResults({ analysis: a, learnFirst, review, sample = false }: { analysis: CompetitiveAnalysis; learnFirst: boolean; review: boolean; sample?: boolean }) {
   const { t, language } = useLanguage();
   const [revealed, setRevealed] = useState(false);
   const [hintCount, setHintCount] = useState(0);

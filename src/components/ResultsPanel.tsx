@@ -18,7 +18,7 @@ function Section({ icon, title, children, delay = 0 }: { icon: React.ReactNode; 
   );
 }
 
-export function ResultsPanel({ analysis }: { analysis: Analysis }) {
+export function ResultsPanel({ analysis, sample = false }: { analysis: Analysis; sample?: boolean }) {
   const { t, language } = useLanguage();
   const [copied, setCopied] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
@@ -43,7 +43,7 @@ export function ResultsPanel({ analysis }: { analysis: Analysis }) {
               {analysis.errorType}
             </span>
             {analysis.lineNumber && <span className="text-sm text-muted-foreground">{t("Line")} {analysis.lineNumber}</span>}
-            <span className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs text-muted-foreground"><Sparkles className="size-3" />{t("Live AI analysis")}</span>
+            <span className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs text-muted-foreground"><Sparkles className="size-3" />{sample ? t("Offline demo sample") : t("Live AI analysis")}</span>
           </div>
           <p className="font-display text-lg font-semibold">{analysis.friendlyQuip}</p>
         </div>

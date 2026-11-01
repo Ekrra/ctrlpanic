@@ -8,3 +8,6 @@
 - [x] Repair Problem Solver error propagation and verify failures, input retention, and safe retries.
 - [ ] Verify a new live Problem Solver analysis (blocked until AI credits are restored).
 - [x] Add bilingual Problem Solver AI availability and credit/setup recovery guidance based on actual request status.
+- [ ] Connect bilingual online/offline selection in all three modes, preserving inputs.
+- [ ] Add the original official buildathon sticker near the top.
+- [ ] Check offline flows, accurate credit failures, and desktop/mobile preview without live AI requests.

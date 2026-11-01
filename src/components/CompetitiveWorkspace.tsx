@@ -9,6 +9,8 @@ import { CodeEditor } from "./CodeEditor";
 import { Mascot } from "./Mascot";
 import { CompetitiveResults } from "./CompetitiveResults";
 import { SolverAvailability } from "./SolverAvailability";
+import { AnalysisSource } from "./AnalysisSource";
+import { OfflineSample } from "./OfflineSample";
 
 type Mode = "solver" | "review";
 const empty = { statement: "", sampleInput: "", sampleOutput: "", constraints: "", code: "", learnFirst: true };
@@ -23,6 +25,7 @@ export function CompetitiveWorkspace({ mode }: { mode: Mode }) {
   const [retryUntil, setRetryUntil] = useState(0);
   const [aiStatus, setAiStatus] = useState<number | undefined>();
   const [aiSucceeded, setAiSucceeded] = useState(false);
+  const [offline, setOffline] = useState(false);
   const submitting = useRef(false);
   useEffect(() => {
     if (!retryUntil) return;
@@ -35,7 +38,7 @@ export function CompetitiveWorkspace({ mode }: { mode: Mode }) {
   const review = mode === "review";
   const update = (key: keyof typeof empty, value: string | boolean) => { setInput(s => ({ ...s, [key]: value })); setProblem(null); };
   const submit = async () => {
-    if (submitting.current || (!review && retryUntil > Date.now())) return;
+    if (submitting.current || offline || retryUntil > Date.now()) return;
     const parsed = competitiveInputSchema.safeParse({ ...input, mode, language });
     if (!parsed.success) { setProblem(parsed.error.issues[0]?.message ?? t("Please check your inputs.")); return; }
     submitting.current = true;
@@ -46,7 +49,7 @@ export function CompetitiveWorkspace({ mode }: { mode: Mode }) {
       else {
         setAiStatus(response.errorStatus); setAiSucceeded(false);
         setProblem(response.error);
-        if (!review && response.retryAfterSeconds) setRetryUntil(Date.now() + response.retryAfterSeconds * 1000);
+        if (response.retryAfterSeconds) setRetryUntil(Date.now() + response.retryAfterSeconds * 1000);
       }
     } catch { setProblem(t("Couldn't reach the AI tutor. Your inputs are safe here; check your connection before trying again.")); }
     finally { submitting.current = false; setLoading(false); }
@@ -54,8 +57,9 @@ export function CompetitiveWorkspace({ mode }: { mode: Mode }) {
   return <section className="px-4 pt-8 pb-16 sm:pb-24"><div className="mx-auto max-w-6xl">
     <div className="mb-6 flex items-center justify-between gap-4"><div><p className="mb-2 font-mono text-xs uppercase tracking-widest text-primary">{t("Competitive programming")}</p><h2 className="text-3xl font-bold sm:text-4xl">{review ? t("Your code. A second pair of eyes.") : t("Think it through. Then code it.")}</h2></div><Mascot mood={loading ? "confused" : "happy"} className={`size-20 shrink-0 sm:size-28 ${loading ? "animate-wiggle" : ""}`} /></div>
     <p className="mb-5 text-sm text-muted-foreground">{t(review ? "AI-based review · Submitted code is not executed." : "AI-based guidance · Submitted code is not executed.")}</p>
-    {!review && <SolverAvailability status={aiStatus} loading={loading} succeeded={aiSucceeded} />}
-    <form onSubmit={e => { e.preventDefault(); void submit(); }} className="min-w-0">
+    <AnalysisSource offline={offline} onChange={setOffline} loading={loading} />
+    {!offline && !review && <SolverAvailability status={aiStatus} loading={loading} succeeded={aiSucceeded} />}
+    <form hidden={offline} onSubmit={e => { e.preventDefault(); void submit(); }} className="min-w-0">
       <fieldset disabled={loading} className="grid min-w-0 gap-5 disabled:opacity-70">
         <Field id={`${mode}-statement`} label={t(review ? "Problem statement (optional, helps check logic)" : "Problem statement")} value={input.statement} onChange={v => update("statement", v)} placeholder={t("Paste the complete problem statement…")} tall />
         <div className="grid min-w-0 gap-5 sm:grid-cols-2"><Field id={`${mode}-sample-input`} label={t("Sample input (optional)")} value={input.sampleInput} onChange={v => update("sampleInput", v)} placeholder={t("Example input from the problem…")} /><Field id={`${mode}-sample-output`} label={t("Sample output (optional)")} value={input.sampleOutput} onChange={v => update("sampleOutput", v)} placeholder={t("Expected output for that sample…")} /></div>
@@ -64,8 +68,10 @@ export function CompetitiveWorkspace({ mode }: { mode: Mode }) {
         {!review && <label className="flex w-fit cursor-pointer items-center gap-3 text-sm font-semibold"><input type="checkbox" checked={input.learnFirst} onChange={e => update("learnFirst", e.target.checked)} className="size-4 accent-primary" />{t("Learn First")}</label>}
       </fieldset>
       {problem && <div role="alert" className="mt-5 flex gap-2 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm"><AlertTriangle className="size-4 shrink-0 text-destructive" />{t(problem)}</div>}
-      <div className="mt-5 flex flex-wrap gap-3"><Button type="submit" disabled={loading || (!review && retryUntil > 0)} className="btn btn-primary h-auto whitespace-normal">{loading ? <Loader2 className="animate-spin" /> : review ? <SearchCheck /> : <BookOpen />}{loading ? t("Thinking it through…") : !review && retryUntil > 0 ? t("Please wait before retrying") : review ? t("Review my solution") : t("Help me solve it")}</Button><Button type="button" disabled={loading} variant="outline" className="btn btn-ghost h-auto" onClick={() => { setInput(empty); setProblem(null); setResult(null); }}><RotateCcw />{t("Reset")}</Button></div>
+      {problem && <Button type="button" variant="outline" className="mt-3" onClick={() => setOffline(true)}>{t("View an offline demo sample")}</Button>}
+      <div className="mt-5 flex flex-wrap gap-3"><Button type="submit" disabled={loading || retryUntil > 0} className="btn btn-primary h-auto whitespace-normal">{loading ? <Loader2 className="animate-spin" /> : review ? <SearchCheck /> : <BookOpen />}{loading ? t("Thinking it through…") : retryUntil > 0 ? t("Please wait before retrying") : review ? t("Review my solution") : t("Help me solve it")}</Button><Button type="button" disabled={loading} variant="outline" className="btn btn-ghost h-auto" onClick={() => { setInput(empty); setProblem(null); setResult(null); }}><RotateCcw />{t("Reset")}</Button></div>
     </form>
-    <div ref={results} className="scroll-mt-28 pt-8">{loading && <div role="status" className="flex items-center gap-3 border-y py-6"><Loader2 className="size-5 shrink-0 animate-spin text-primary" /><p>{t("Connecting the dots, one step at a time\u2026")}</p></div>}{!loading && result && <CompetitiveResults analysis={result.analysis} learnFirst={result.learnFirst} review={review} />}</div>
+    {offline && <OfflineSample mode={mode} onClose={() => setOffline(false)} />}
+    <div hidden={offline} ref={results} className="scroll-mt-28 pt-8">{loading && <div role="status" className="flex items-center gap-3 border-y py-6"><Loader2 className="size-5 shrink-0 animate-spin text-primary" /><p>{t("Connecting the dots, one step at a time\u2026")}</p></div>}{!loading && result && <CompetitiveResults analysis={result.analysis} learnFirst={result.learnFirst} review={review} />}</div>
   </div></section>;
 }

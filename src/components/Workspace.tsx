@@ -9,6 +9,8 @@ import { EXAMPLES } from "@/lib/examples";
 import { CodeEditor } from "./CodeEditor";
 import { Mascot, type Mood } from "./Mascot";
 import { ResultsPanel } from "./ResultsPanel";
+import { AnalysisSource } from "./AnalysisSource";
+import { OfflineSample } from "./OfflineSample";
 
 const LOADING_LINES = ["Reading your code, no judgment…", "Asking Python what it meant…", "Untangling the spaghetti…"];
 
@@ -20,6 +22,8 @@ export function Workspace() {
   const [problem, setProblem] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [exampleId, setExampleId] = useState<string | null>(null);
+  const [offline, setOffline] = useState(false);
+  const submitting = useRef(false);
   const run = useServerFn(analyzeCode);
   const resultsRef = useRef<HTMLDivElement>(null);
 
@@ -34,7 +38,9 @@ export function Workspace() {
   const reset = () => { setCode(""); setErrorMsg(""); setProblem(null); setAnalysis(null); setExampleId(null); };
 
   const submit = async () => {
+    if (submitting.current || offline) return;
     if (!code.trim()) { setProblem(t("Oops, the editor is empty. Paste some Python code first.")); return; }
+    submitting.current = true;
     setLoading(true); setProblem(null); setAnalysis(null);
     try {
       const res = await run({ data: { code, errorMessage: errorMsg, language } });
@@ -45,7 +51,7 @@ export function Workspace() {
     } catch (e) {
       const msg = e instanceof Error ? e.message : "";
       setProblem(msg.includes("12,000") ? t("That's a lot of code! Keep it under 12,000 characters.") : t("Couldn't reach the server. Check your connection and try again."));
-    } finally { setLoading(false); }
+    } finally { submitting.current = false; setLoading(false); }
   };
 
   return (
@@ -59,7 +65,8 @@ export function Workspace() {
           <Mascot mood={mood} className={`size-20 sm:size-28 ${loading ? "animate-wiggle" : ""}`} />
         </div>
 
-        <div className="card-soft overflow-hidden">
+        <AnalysisSource offline={offline} onChange={setOffline} loading={loading} />
+        <div hidden={offline} className="card-soft overflow-hidden">
           <div className="flex flex-wrap items-center gap-2 border-b bg-muted/60 px-4 py-3">
             <span className="mr-1 text-sm font-medium text-muted-foreground">{t("Try an example:")}</span>
             {EXAMPLES.map((ex) => (
@@ -90,6 +97,7 @@ export function Workspace() {
                 </div>
               )}
               <div className="flex flex-col gap-2 sm:flex-row lg:flex-col xl:flex-row">
+                {problem && <Button type="button" variant="outline" onClick={() => setOffline(true)}>{t("View an offline demo sample")}</Button>}
                 <Button type="button" onClick={submit} disabled={loading} className="btn btn-primary flex-1">
                   {loading ? <Loader2 className="size-4 animate-spin" /> : <Wand2 className="size-4" />}
                   {loading ? t("Analyzing…") : t("Analyze my code")}
@@ -100,7 +108,8 @@ export function Workspace() {
           </div>
         </div>
 
-        <div ref={resultsRef} className="scroll-mt-24 pt-8">
+        {offline && <OfflineSample mode="debug" onClose={() => setOffline(false)} />}
+        <div hidden={offline} ref={resultsRef} className="scroll-mt-24 pt-8">
           {loading && (
             <div className="card-soft flex items-center gap-4 p-6" role="status">
               <Loader2 className="size-5 animate-spin text-primary" />

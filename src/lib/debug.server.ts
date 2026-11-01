@@ -40,15 +40,26 @@ export async function analyzePython(code: string, errorMessage: string, language
         openai: { forceReasoning: true, reasoningEffort: "low", store: false, include: ["reasoning.encrypted_content"] },
       },
     });
+    for await (const part of result.fullStream) {
+      if (part.type === "error") throw part.error;
+    }
     const analysis = await result.output;
     return { ok: true, analysis: analysisSchema.parse(analysis) };
   } catch (err) {
-    console.error("CtrlPanic analysis failed", err);
-    const status = (err as { statusCode?: number })?.statusCode;
+    const failure = err as { statusCode?: number; responseBody?: string };
+    const status = failure?.statusCode;
+    console.error("CtrlPanic analysis failed", { status, name: err instanceof Error ? err.name : "UnknownError" });
+    let safeMessage = "";
+    try {
+      const body = JSON.parse(failure.responseBody ?? "{}");
+      const message = body?.error?.message ?? body?.message;
+      if (typeof message === "string") safeMessage = message;
+    } catch { /* No safe structured error message. */ }
+    if (safeMessage) return { ok: false, kind: status === 402 ? "credits" : status === 401 ? "setup" : status === 429 ? "rate" : "unknown", error: safeMessage };
     if (status === 401) return { ok: false, kind: "setup", error: "The AI key on the server isn't valid. The site owner needs to fix setup." };
     if (status === 402) return { ok: false, kind: "credits", error: "AI credits have run out for this workspace. Please try again later." };
-    if (status === 403) return { ok: false, kind: "credits", error: "AI access is currently blocked for this workspace." };
+    if (status === 403) return { ok: false, kind: "unknown", error: "AI access is currently blocked for this workspace." };
     if (status === 429) return { ok: false, kind: "rate", error: "Too many requests right now. Take a breath and try again in a moment." };
-    return { ok: false, kind: "unknown", error: "Our AI tutor tripped over a cable. Please try again." };
+    return { ok: false, kind: "unknown", error: "The AI couldn't complete this analysis. Your inputs are still here; no code was executed." };
   }
 }

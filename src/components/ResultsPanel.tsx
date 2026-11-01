@@ -90,7 +90,7 @@ export function ResultsPanel({ analysis, sample = false }: { analysis: Analysis;
       </Section>
 
       <section className="animate-rise rounded-2xl border bg-butter/40 p-5 sm:p-6" style={{ animationDelay: "300ms" }}>
-        <h3 className="mb-2 flex items-center gap-2 font-semibold"><Lightbulb className="size-4" /> Practice round</h3>
+        <h3 className="mb-2 flex items-center gap-2 font-semibold"><Lightbulb className="size-4" />{t("Practice round")}</h3>
         <p className="mb-3 leading-relaxed">{analysis.practice.question}</p>
         <p className="mb-4 text-sm text-muted-foreground"><span className="font-semibold">{t("Hint:")}</span> {analysis.practice.hint}</p>
         <Button type="button" className="btn btn-ghost bg-card py-2 text-sm" onClick={() => setShowAnswer((v) => !v)} aria-expanded={showAnswer}>

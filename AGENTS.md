@@ -10,7 +10,7 @@
 <!-- LOVABLE:END -->
 
 - AI debugging runs only server-side: `src/lib/debug.functions.ts` (server fn) → `src/lib/debug.server.ts` (Lovable AI Gateway, structured output validated by the zod schema in `src/lib/debug.schema.ts`). Why: keeps the key secret and gives the UI one typed result shape.
-- Example snippets in `src/lib/examples.ts` are inputs only; never ship canned AI responses. Why: users must never see fake analysis.
+- Example snippets in `src/lib/examples.ts` are inputs only; prewritten walkthroughs stay in `demo-samples.ts` and render exclusively through explicitly selected OfflineSample views. Why: real AI and offline education must never be confused.
 - CodeMirror loads client-only via `CodeEditor` lazy wrapper. Why: avoids SSR import issues.
 - LearningWorkspace keeps each mode mounted independently; CompetitiveWorkspace shares solver/review form logic, and competitive.functions.ts delegates structured AI work to competitive.server.ts. Why: preserves Debug Mode and each mode's inputs while keeping keys and prompts server-only.
 - Competitive AI uses request-local Responses and run-ID helpers under src/lib/ai; no submitted Python is executed. Why: real analysis without unsafe execution or false judge verdicts.
@@ -18,3 +18,4 @@
 - Problem Solver availability uses typed failure status and the last submitted request, never background AI probes or inferred live balances. Why: explain credit/setup recovery without extra usage or false availability claims.
 - Optional creator profile links are configured through src/lib/creator.ts and omitted until set. Why: no invented destination or dead placeholder link.
 - LanguageProvider owns the shared session language; shared language validation and translation helpers feed existing forms and server prompts. Why: mode switches stay consistent without modifying Python or fabricating translated AI results.
+- AnalysisSource switches each mounted workspace between retained online forms/results and separate offline samples without initiating server calls. Why: switching must not cost credits or overwrite student work.

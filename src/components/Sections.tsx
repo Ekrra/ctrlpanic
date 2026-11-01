@@ -3,6 +3,7 @@ import { MessageCircleHeart, Footprints, GraduationCap, Leaf, ClipboardPaste, Br
 import { Button } from "./ui/button";
 import { Mascot } from "./Mascot";
 import { CREATOR_GITHUB_URL } from "@/lib/creator";
+import buildathonSticker from "@/assets/buildathon-sticker.asset.json";
 
 export function Navbar() {
   const { t, language, setLanguage } = useLanguage();
@@ -35,10 +36,11 @@ export function Hero() {
   const { t, language, setLanguage } = useLanguage();
   return (
     <section id="top" className="bg-hero relative overflow-hidden px-4 pt-14 pb-10 sm:pt-24">
+      <img src={buildathonSticker.url} alt="Built For Ostad Presents YUNet AIgnite Buildathon 2026" width={1920} height={681} className="mx-auto mb-8 h-auto w-full max-w-sm object-contain" />
       <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-[1.2fr_1fr]">
         <div className="animate-rise">
           <span className="mb-5 inline-flex items-center gap-2 rounded-full border bg-card/70 px-3 py-1 text-xs font-medium text-muted-foreground">
-            <span className="size-1.5 rounded-full bg-success" /> AI Python tutor for beginners & CP students
+            <span className="size-1.5 rounded-full bg-success" />{t("AI Python tutor for beginners & CP students")}
           </span>
           <h1 className="text-5xl font-extrabold leading-[1.02] sm:text-7xl">{t("Code not working?")}</h1>
           <p className="mt-4 font-display text-2xl font-semibold text-primary sm:text-3xl">{t("Ctrl your panic. Fix your code.")}</p>

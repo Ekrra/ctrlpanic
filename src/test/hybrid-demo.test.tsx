@@ -19,11 +19,11 @@ describe("Hybrid online/offline safety", () => {
     fireEvent.click(screen.getByRole("tab", { name: mode }));
     const label = mode === "Debug Mode" ? "Python code editor" : mode === "Code Review" ? "Python solution to review" : "Problem statement";
     fireEvent.change(screen.getByLabelText(label), { target: { value: "Student work stays here" } });
-    fireEvent.click(screen.getByRole("button", { name: "Offline demo sample", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: /^Offline demo sample$/ }));
     expect(screen.getByTestId("offline-sample")).toBeVisible();
-    fireEvent.click(screen.getByRole("button", { name: "বাংলা", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: /^বাংলা$/ }));
     expect(screen.getByTestId("offline-sample")).toBeVisible();
-    fireEvent.click(screen.getByRole("button", { name: "অনলাইন AI", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: /^অনলাইন AI$/ }));
     expect(screen.getByDisplayValue("Student work stays here")).toBeVisible();
     expect(run).not.toHaveBeenCalled();
   });
